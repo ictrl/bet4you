@@ -2,9 +2,9 @@
 
 require("dotenv").config();
 
-const { Mysql } = require("./Utils");
+const { Mysql } = require("./utils");
 
-const serverPort = 8000,
+const serverPort = 9069,
   http = require("http"),
   express = require("express"),
   app = express(),
@@ -22,8 +22,9 @@ websocketServer.on("connection", (webSocketClient) => {
     msg = msg.toString();
     setInterval(async () => {
       const res = await Mysql.query(msg);
-      const { match_id, team_1_odd_khai } = res;
-      webSocketClient.send(JSON.stringify({ match_id, team_1_odd_khai }));
+      // const { match_id, team_1_odd_khai } = res;
+      // webSocketClient.send(JSON.stringify({ match_id, team_1_odd_khai }));
+      webSocketClient.send(JSON.stringify(res));
     }, 1000);
   });
 
