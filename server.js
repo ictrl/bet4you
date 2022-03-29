@@ -25,7 +25,7 @@ websocketServer.on("connection", (webSocketClient) => {
       // const { match_id, team_1_odd_khai } = res;
       // webSocketClient.send(JSON.stringify({ match_id, team_1_odd_khai }));
       webSocketClient.send(JSON.stringify(res));
-    }, 1000);
+    }, 2000);
   });
 
   //handle close connection

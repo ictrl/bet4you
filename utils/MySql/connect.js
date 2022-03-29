@@ -17,9 +17,9 @@ connection.connect(function (err) {
 const connect = async (match_id) => {
   const query = `Select * from odd_bet where match_id=${match_id} and src='api'`;
   const res = await performQuery(connection, query);
-  return res[0];
+  return res;
 
-  connection.end();
+  // connection.end();
 };
 
 /* promisified query method, suitable for await */
