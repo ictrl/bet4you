@@ -14,8 +14,8 @@ connection.connect(function (err) {
   console.log("connected as id " + connection.threadId);
 });
 
-const connect = async (match_id) => {
-  const query = `Select * from odd_bet where match_id=${match_id}`;
+const connect = async (match_id,src) => {
+  const query = `SELECT scorecard.*,odd_bet.market_status as market_status_team1,odd_bet.market_status_team2,odd_bet.market_status_draw,odd_bet.same_bhaw_market_status FROM scorecard INNER JOIN odd_bet ON scorecard.match_id=odd_bet.match_id WHERE scorecard.match_id=${match_id} and scorecard.score_src=${src} and odd_bet.result='pending' and odd_bet.src='manual'`;
   const res = await performQuery(connection, query);
   return res;
 

@@ -14,8 +14,8 @@ connection.connect(function (err) {
   console.log("connected as id " + connection.threadId);
 });
 
-const connect = async (match_id) => {
-  const query = `Select * from odd_bet where match_id=${match_id}`;
+const connect = async (match_id,src) => {
+  const query = `SELECT * from session_bet where match_id=${match_id} and src=${src} and result_status='pending' and is_active='1'`;
   const res = await performQuery(connection, query);
   return res;
 
