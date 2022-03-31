@@ -15,19 +15,17 @@ const serverPort = 3075,
 //when a websocket connection is established
 websocketServer.on("connection", (webSocketClient) => {
   //send feedback to the incoming connection
-  webSocketClient.send('{ "connectionss" : "ok"}');
+  webSocketClient.send('{ "connections" : "ok"}');
 
   //when a message is received
   webSocketClient.on("message", async (msg) => {
     msg = msg.toString();
-	  msg = msg.split(' ');
-	  const match_id = msg[0];
-	  const action = msg[1]
-   	console.log({match_id, action})
+    msg = msg.split(" ");
+    const match_id = msg[0];
+    const action = msg[1];
+    console.log({ match_id, action });
     setInterval(async () => {
-      const res = await MysqlS.query(match_id,action);
-      // const { match_id, team_1_odd_khai } = res;
-      // webSocketClient.send(JSON.stringify({ match_id, team_1_odd_khai }));
+      const res = await MysqlS.query(match_id, action);
       webSocketClient.send(JSON.stringify(res));
     }, 2500);
   });
