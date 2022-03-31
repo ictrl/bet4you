@@ -18,11 +18,14 @@ websocketServer.on("connection", (webSocketClient) => {
   webSocketClient.send('{ "connection" : "ok"}');
 
   //when a message is received
-  webSocketClient.on("message", async (msg,src) => {
+  webSocketClient.on("message", async (msg) => {
     msg = msg.toString();
-    src = src.toString();
+	  msg = msg.split(' ');
+	  const match_id = msg[0];
+	  const action = msg[1];
+	  console.log({match_id, action})
     setInterval(async () => {
-      const res = await Mysqlsc.query(msg,src);
+      const res = await Mysqlsc.query(match_id,action);
       // const { match_id, team_1_odd_khai } = res;
       // webSocketClient.send(JSON.stringify({ match_id, team_1_odd_khai }));
       webSocketClient.send(JSON.stringify(res));

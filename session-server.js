@@ -15,7 +15,7 @@ const serverPort = 3075,
 //when a websocket connection is established
 websocketServer.on("connection", (webSocketClient) => {
   //send feedback to the incoming connection
-  webSocketClient.send('{ "connection" : "ok"}');
+  webSocketClient.send('{ "connectionss" : "ok"}');
 
   //when a message is received
   webSocketClient.on("message", async (msg) => {
@@ -29,7 +29,7 @@ websocketServer.on("connection", (webSocketClient) => {
       // const { match_id, team_1_odd_khai } = res;
       // webSocketClient.send(JSON.stringify({ match_id, team_1_odd_khai }));
       webSocketClient.send(JSON.stringify(res));
-    }, 2200);
+    }, 2500);
   });
 
   //handle close connection
