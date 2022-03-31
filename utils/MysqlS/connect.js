@@ -15,7 +15,7 @@ connection.connect(function (err) {
 });
 
 const connect = async (match_id, src) => {
-  const query = `SELECT session_title,session_id,session_key_no,session_key_yes,session_rate_yes,session_rate_no from session_bet where match_id='${match_id}' and src='${src}' and result_status='pending' and is_active='1'`;
+  const query = `SELECT market_status,session_title,src,session_id,session_key_no,session_key_yes,session_rate_yes,session_rate_no from session_bet where match_id='${match_id}' and src='${src}' and result_status='pending' and is_active='1'`;
   const res = await performQuery(connection, query);
   return res;
 
