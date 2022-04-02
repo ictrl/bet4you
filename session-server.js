@@ -2,7 +2,7 @@
 
 require("dotenv").config();
 
-const { MysqlS } = require("./utils/index2");
+const { Mysql } = require("./utils");
 
 const serverPort = 3075,
   http = require("http"),
@@ -22,10 +22,11 @@ websocketServer.on("connection", (webSocketClient) => {
     msg = msg.toString();
     msg = msg.split(" ");
     const match_id = msg[0];
-    const action = msg[1];
-    console.log({ match_id, action });
+    const src = msg[1];
+
     setInterval(async () => {
-      const res = await MysqlS.query(match_id, action);
+      const query = `SELECT market_status,session_title,src,session_id,session_key_no,session_key_yes,session_rate_yes,session_rate_no from session_bet where match_id='${match_id}' and src='${src}' and result_status='pending' and is_active='1'`;
+      const res = await Mysql.query(query);
       webSocketClient.send(JSON.stringify(res));
     }, 2500);
   });

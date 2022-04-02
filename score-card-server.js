@@ -2,7 +2,7 @@
 
 require("dotenv").config();
 
-const { Mysqlsc } = require("./utils/index3");
+const { Mysql } = require("./utils");
 
 const serverPort = 5074,
   http = require("http"),
@@ -20,14 +20,13 @@ websocketServer.on("connection", (webSocketClient) => {
   //when a message is received
   webSocketClient.on("message", async (msg) => {
     msg = msg.toString();
-	  msg = msg.split(' ');
-	  const match_id = msg[0];
-	  const action = msg[1];
-	  console.log({match_id, action})
+    msg = msg.split(" ");
+    const match_id = msg[0];
+    const src = msg[1];
+
     setInterval(async () => {
-      const res = await Mysqlsc.query(match_id,action);
-      // const { match_id, team_1_odd_khai } = res;
-      // webSocketClient.send(JSON.stringify({ match_id, team_1_odd_khai }));
+      const query = `SELECT scorecard.*,odd_bet.market_status as market_status_team1,odd_bet.market_status_team2,odd_bet.market_status_draw,odd_bet.same_bhaw_market_status FROM scorecard INNER JOIN odd_bet ON scorecard.match_id=odd_bet.match_id WHERE scorecard.match_id=${match_id} and scorecard.score_src='${src}' and odd_bet.result='pending' and odd_bet.src='manual'`;
+      const res = await Mysql.query(query);
       webSocketClient.send(JSON.stringify(res));
     }, 2500);
   });
