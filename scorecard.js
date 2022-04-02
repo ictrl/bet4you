@@ -1,12 +1,13 @@
 require("dotenv").config();
 const { Mysql } = require("./utils");
+const { SCORECARD } = require("./config");
+const { PORT, FREQUENCY } = SCORECARD;
+
 const WebSocket = require("ws");
-const e = require("express");
-const port = 5074;
 const eventMap = new Map();
 const intervalMap = new Map();
 
-const wss = new WebSocket.Server({ port });
+const wss = new WebSocket.Server({ PORT });
 
 wss.on("connection", (wsc) => {
   const id = uuidv4();
@@ -42,7 +43,7 @@ wss.on("connection", (wsc) => {
           console.log("@@ ~ client", event, client.id);
           client.send(JSON.stringify(res));
         }
-      }, 2500);
+      }, FREQUENCY);
 
       const intervalId = intervalObj[Symbol.toPrimitive]();
       intervalMap.set(event, intervalId); //one to one relation between Interval and Event
@@ -87,4 +88,4 @@ function uuidv4() {
     return v.toString(16);
   });
 }
-console.log("scorecards script started on port", port);
+console.log("scorecards script started on PORT", PORT);
