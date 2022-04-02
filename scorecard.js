@@ -1,24 +1,17 @@
-"use strict";
-
 require("dotenv").config();
-
 const { Mysql } = require("./utils");
+const WebSocket = require("ws");
+const port = 5074;
 
-const serverPort = 5074,
-  http = require("http"),
-  express = require("express"),
-  app = express(),
-  server = http.createServer(app),
-  WebSocket = require("ws"),
-  websocketServer = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ port });
 
-//when a websocket connection is established
-websocketServer.on("connection", (webSocketClient) => {
-  //send feedback to the incoming connection
-  webSocketClient.send('{ "connection" : "ok"}');
+wss.on("connection", (wsc) => {
+  const id = uuidv4();
+  wsc.id = id;
+  wsc.send(`{ "connection id" : "${id}}"`);
+  console.log("new connection :", id);
 
-  //when a message is received
-  webSocketClient.on("message", async (msg) => {
+  wsc.on("message", (msg) => {
     msg = msg.toString();
     msg = msg.split(" ");
     const match_id = msg[0];
@@ -27,17 +20,29 @@ websocketServer.on("connection", (webSocketClient) => {
     setInterval(async () => {
       const query = `SELECT scorecard.*,odd_bet.market_status as market_status_team1,odd_bet.market_status_team2,odd_bet.market_status_draw,odd_bet.same_bhaw_market_status FROM scorecard INNER JOIN odd_bet ON scorecard.match_id=odd_bet.match_id WHERE scorecard.match_id=${match_id} and scorecard.score_src='${src}' and odd_bet.result='pending' and odd_bet.src='manual'`;
       const res = await Mysql.query(query);
-      webSocketClient.send(JSON.stringify(res));
+      wsc.send(JSON.stringify(res));
     }, 2500);
-  });
 
-  //handle close connection
-  webSocketClient.on("close", () => {
-    console.log("The connection has been closed successfully.");
+    wsc.on("close", () => {
+      console.log(wsc.id, "closed");
+    });
   });
 });
 
-//start the web server
-server.listen(serverPort, () => {
-  console.log(`Websocket server started on port ` + serverPort);
-});
+setInterval(() => {
+  console.log("------------------------------------");
+  let client_count = 0;
+  wss.clients.forEach(function each(wsc) {
+    client_count = client_count + 1;
+  });
+  console.log("@@ ~ client_count", client_count);
+}, 1000);
+
+function uuidv4() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+console.log("odds script started on port", port);
