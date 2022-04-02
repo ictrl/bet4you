@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { Mysql } = require("./utils");
-const { SCORECARD } = require("./config");
-const { port, frequency } = SCORECARD;
+const { ODDS } = require("./config");
+const { port, frequency } = ODDS;
 
 const WebSocket = require("ws");
 const eventMap = new Map();

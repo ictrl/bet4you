@@ -1,7 +1,8 @@
 require("dotenv").config();
 const { Mysql } = require("./utils");
-const config = require("./config");
-const { port, frequency } = config.SCORECARD;
+const { SESSION } = require("./config");
+const { port, frequency } = SESSION;
+
 console.log("@@ ~ port", port);
 
 const WebSocket = require("ws");
