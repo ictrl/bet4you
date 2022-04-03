@@ -1,12 +1,14 @@
 const WebSocket = require("ws");
 const url1 = "ws://3.111.105.44:3075"; //session
 const count = 1000;
+const match_id = "31323015";
+
 for (let i = 0; i < count; i++) {
   console.log({ i });
   const connection = new WebSocket(url1);
 
   connection.onopen = () => {
-    connection.send("31342464 api");
+    connection.send(`${match_id} api`);
   };
 
   connection.onerror = (error) => {
@@ -25,7 +27,7 @@ for (let i = 0; i < count; i++) {
   const connection = new WebSocket(url2);
 
   connection.onopen = () => {
-    connection.send("31342464");
+    connection.send(`${match_id}`);
   };
 
   connection.onerror = (error) => {
@@ -44,7 +46,7 @@ for (let i = 0; i < count; i++) {
   const connection = new WebSocket(url3);
 
   connection.onopen = () => {
-    connection.send("31342464 manual");
+    connection.send(`${match_id} manual`);
   };
 
   connection.onerror = (error) => {
