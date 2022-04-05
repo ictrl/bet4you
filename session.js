@@ -35,7 +35,7 @@ wss.on("connection", (wsc) => {
       //start a new interval
       eventMap.set(event, [wsc]);
       const intervalObj = setInterval(async () => {
-        const query = `SELECT market_status,session_title,src,session_id,session_key_no,session_key_yes,session_rate_yes,session_rate_no from session_bet where match_id='${match_id}' and src='${src}' and result_status='pending' and is_active='1'`;
+        const query = `SELECT market_status,session_title,src,bw_active,session_id,session_key_no,session_key_yes,session_rate_yes,session_rate_no from session_bet where match_id='${match_id}' and src='${src}' and result_status='pending' and is_active='1'`;
 
         const res = await Mysql.query(query);
         const clients = eventMap.get(event);
