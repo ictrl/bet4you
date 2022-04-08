@@ -13,7 +13,7 @@ wss.on("connection", (wsc, req) => {
   let host = req.headers.host;
   host = host.split(":")[0];
   const isHost = HOSTS.findIndex((e) => e === host);
-  if (isHost) {
+  if (!isHost) {
     //unknow host
     wsc.terminate();
   } else {
