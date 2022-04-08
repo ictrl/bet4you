@@ -15,5 +15,5 @@ module.exports = {
     port: 7000,
     frequency: 2000,
   },
-  HOSTS: ["localhost", "3.111.105.44"],
+  HOSTS: ["3.111.105.44"],
 };
