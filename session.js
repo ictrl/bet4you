@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { Mysql } = require("./utils");
-const { SESSION, HOSTS } = require("./config");
+const { SESSION, ORIGINS } = require("./config");
 const { port, frequency } = SESSION;
 
 console.log("@@ ~ port", port);
@@ -12,10 +12,9 @@ const intervalMap = new Map();
 const wss = new WebSocket.Server({ port });
 
 wss.on("connection", (wsc, req) => {
-  let host = req.headers.host;
-  host = host.split(":")[0];
-  const isHost = HOSTS.findIndex((e) => e === host);
-  if (isHost == -1) {
+  let origin = req.headers.origin;
+  const isAllowed = ORIGINS.find((e) => e === origin);
+  if (!isAllowed) {
     //unknow host
     wsc.terminate();
   } else {
