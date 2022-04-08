@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { Mysql } = require("./utils");
-const { CASINO } = require("./config");
+const { CASINO, HOSTS } = require("./config");
 const { port, frequency } = CASINO;
 
 const WebSocket = require("ws");
@@ -9,60 +9,68 @@ const intervalMap = new Map();
 
 const wss = new WebSocket.Server({ port });
 
-wss.on("connection", (wsc) => {
-  const id = uuidv4();
-  wsc.id = id;
-  wsc.send(`{ "connection id" : "${id}}"`);
-  console.log("new connection :", id);
+wss.on("connection", (wsc, req) => {
+  let host = req.headers.host;
+  host = host.split(":")[0];
+  const isHost = HOSTS.findIndex((e) => e === host);
+  if (isHost) {
+    //unknow host
+    wsc.terminate();
+  } else {
+    const id = uuidv4();
+    wsc.id = id;
+    wsc.send(`{ "connection id" : "${id}}"`);
+    console.log("new connection :", id);
 
-  wsc.on("message", (event) => {
-    event = event.toString();
-    wsc.event = event; //adding event to remove from MAP after client conn. close
+    wsc.on("message", (event) => {
+      event = event.toString();
+      wsc.event = event; //adding event to remove from MAP after client conn. close
 
-    //manage match_id and scr with interval id
-    const isEvent = eventMap.get(event);
-    console.log("@@ ~ isEvent", event);
-    if (isEvent) {
-      //interval is already exist
-      //map client to get data
-      eventMap.set(event, [...isEvent, wsc]);
-    } else {
-      //start a new interval
-      eventMap.set(event, [wsc]);
-      const intervalObj = setInterval(async () => {
-        const query = `select * from casino_rate where game_type='${event}'`;
-
-        const res = await Mysql.query(query);
-        const clients = eventMap.get(event);
-        console.log("@@ ~ clients", clients.length);
-        for (let i = 0; i < clients.length; i++) {
-          const client = clients[i];
-          console.log("@@ ~ client", event, client.id);
-          client.send(JSON.stringify(res));
-        }
-      }, frequency);
-
-      const intervalId = intervalObj[Symbol.toPrimitive]();
-      intervalMap.set(event, intervalId); //one to one relation between Interval and Event
-    }
-    wsc.on("close", () => {
-      console.log(wsc.id, wsc.event, "closed");
-      const clients = eventMap.get(wsc.event);
-      const new_active_clients = clients.filter(
-        (client) => client.id != wsc.id
-      );
-      if (new_active_clients.length > 0) {
-        //update the active clients to eventMap
-        eventMap.set(wsc.event, new_active_clients);
+      //manage match_id and scr with interval id
+      const isEvent = eventMap.get(event);
+      console.log("@@ ~ isEvent", event);
+      if (isEvent) {
+        //interval is already exist
+        //map client to get data
+        eventMap.set(event, [...isEvent, wsc]);
       } else {
-        //remove event from eventMap
-        eventMap.delete(wsc.event);
-        const intervalId = intervalMap.get(wsc.event);
-        clearInterval(intervalId);
-        intervalMap.delete(wsc.event);
+        //start a new interval
+        eventMap.set(event, [wsc]);
+        const intervalObj = setInterval(async () => {
+          const query = `select * from casino_rate where game_type='${event}'`;
+
+          const res = await Mysql.query(query);
+          const clients = eventMap.get(event);
+          console.log("@@ ~ clients", clients.length);
+          for (let i = 0; i < clients.length; i++) {
+            const client = clients[i];
+            console.log("@@ ~ client", event, client.id);
+            client.send(JSON.stringify(res));
+          }
+        }, frequency);
+
+        const intervalId = intervalObj[Symbol.toPrimitive]();
+        intervalMap.set(event, intervalId); //one to one relation between Interval and Event
       }
+      wsc.on("close", () => {
+        console.log(wsc.id, wsc.event, "closed");
+        const clients = eventMap.get(wsc.event);
+        const new_active_clients = clients.filter(
+          (client) => client.id != wsc.id
+        );
+        if (new_active_clients.length > 0) {
+          //update the active clients to eventMap
+          eventMap.set(wsc.event, new_active_clients);
+        } else {
+          //remove event from eventMap
+          eventMap.delete(wsc.event);
+          const intervalId = intervalMap.get(wsc.event);
+          clearInterval(intervalId);
+          intervalMap.delete(wsc.event);
+        }
+      });
     });
-  });
+  }
 });
 
 const intervalObj = setInterval(() => {
