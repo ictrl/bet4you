@@ -1,4 +1,3 @@
-
 module.exports = {
   apps: [
     {
@@ -7,6 +6,7 @@ module.exports = {
       instances: 1,
       cron_restart: "30 21 * * *",
       max_memory_restart: "5G",
+      node_args: "--max_old_space_size=6144",
     },
     {
       name: "session",
@@ -14,6 +14,7 @@ module.exports = {
       instances: 1,
       cron_restart: "30 21 * * *",
       max_memory_restart: "5G",
+      node_args: "--max_old_space_size=6144",
     },
     {
       name: "scorecard",
@@ -21,6 +22,7 @@ module.exports = {
       instances: 1,
       cron_restart: "30 21 * * *",
       max_memory_restart: "5G",
+      node_args: "--max_old_space_size=6144",
     },
     {
       name: "casino",
@@ -28,7 +30,7 @@ module.exports = {
       instances: 1,
       cron_restart: "30 21 * * *",
       max_memory_restart: "5G",
+      node_args: "--max_old_space_size=6144",
     },
   ],
 };
-
